@@ -1,4 +1,4 @@
-SiteView = require 'views/site-view'
+SiteView = require 'views/layout/site-view'
 
 module.exports = class Controller extends Chaplin.Controller
   # Compositions persist stuff between controllers.

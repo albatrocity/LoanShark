@@ -32,10 +32,16 @@ module.exports = class LoansController extends Controller
       collection: @loans
 
   update: (model, success, error) ->
+    item_name = model.get('item_name')
+    if model.isNew()
+      message = "Successfully loaned out #{item_name}."
+    else
+      message = "Successfully edited the loan for #{item_name}"
+
     model.save model.attributes,
       success: (model, attrs) =>
         success(model) if success
         @redirectTo 'home'
-        @publishEvent 'flash', "Successfully loaned out #{model.item_title}."
+        @publishEvent 'flash_message', message
       error: (model, err) ->
         error(model, err) if error
