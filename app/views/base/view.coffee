@@ -24,8 +24,8 @@ module.exports = class View extends Chaplin.View
       @$el.find("[data-bind='#{attr_name}']").text(@model.get(attr_name))
 
   save: (e, success, error) ->
-    @$el.find("input").each (i, el) =>
+    @$el.find("input, select").each (i, el) =>
       $el = $(el)
       name = $el.attr('name')
       @model.set name, $el.val()
-    @publishEvent 'saveLoan', @model
+    @publishEvent "save#{@model.constructor.name}", @model

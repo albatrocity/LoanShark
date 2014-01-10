@@ -3,7 +3,7 @@ Loan       = require '/models/loan'
 
 module.exports = class Loans extends Collection
   model: Loan
-  localStorage: new Backbone.LocalStorage("LoansCollection")
+  localStorage: new Backbone.LocalStorage("ls-Loans")
   initialize: ->
     super
     @listenTo @, 'change', @sort

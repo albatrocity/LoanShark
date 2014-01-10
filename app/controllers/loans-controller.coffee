@@ -1,35 +1,29 @@
 Controller = require 'controllers/base/controller'
 Loan       = require 'models/loan'
-Loans      = require 'models/loans'
 LoansView  = require 'views/loans/loans-view'
 LoanEditView = require 'views/loans/loan-edit-view'
+
+loans  = Chaplin.mediator.loans
+people = Chaplin.mediator.people
 
 module.exports = class LoansController extends Controller
 
   initialize: ->
+    super
     @subscribeEvent 'saveLoan', @update
 
-  beforeAction: ->
-    super
-    # @people = new People
-    # @people.fetch()
-    @loans  = new Loans
-    @loans.fetch()
-
   index: ->
-    @view = new LoansView region: 'main', collection: @loans
+    @view = new LoansView region: 'main', collection: loans
 
   edit: (params) ->
     if params.id
-      @model = @loans.get(params.id)
-      console.log @model
+      model = loans.get(params.id)
     else
-      @model = @loans.add({})
+      model = loans.add({})
 
     @view  = new LoanEditView
-      model: @model
+      model: model
       region: 'main'
-      collection: @loans
 
   update: (model, success, error) ->
     item_name = model.get('item_name')
@@ -41,6 +35,7 @@ module.exports = class LoansController extends Controller
     model.save model.attributes,
       success: (model, attrs) =>
         success(model) if success
+        console.log model
         @redirectTo 'home'
         @publishEvent 'flash_message', message
       error: (model, err) ->
