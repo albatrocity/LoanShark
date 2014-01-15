@@ -15,19 +15,30 @@ module.exports = class View extends Chaplin.View
   render: ->
     super
     if @model
-      @attr_names = _.keys @model.attributes
+      @attr_names = Object.keys(@model.attributes)
       @updateView() if @autoBind
 
   updateView: ->
     for attr_name in @attr_names
-      @$el.find("[name='#{attr_name}']").val(@model.get(attr_name))
-      @$el.find("[data-bind='#{attr_name}']").text(@model.get(attr_name))
+      input_el = @el.querySelector("[name='#{attr_name}']")
+      if input_el
+        input_el.value = @model.get(attr_name)
+
+      text = @el.querySelector("[data-bind='#{attr_name}']")
+      if text
+        text.innerHTML(@model.get(attr_name))
 
   save: (e, success, error) ->
-    @$el.find("input, select").each (i, el) =>
-      $el = $(el)
-      name = $el.attr('name')
-      @model.set name, $el.val(), silent: true
+    # Simple binding/mapping
+    input_els = []
+    for el in @el.getElementsByTagName("input")
+      input_els.push el
+    for el in @el.getElementsByTagName("select")
+      input_els.push el
+
+    input_els.forEach (el) =>
+      name = el.getAttribute('name')
+      @model.set name, el.value, silent: true
     @publishEvent "save#{@model.constructor.name}", @model
 
   destroy: (e, success, error) ->

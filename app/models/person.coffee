@@ -22,7 +22,7 @@ module.exports = class Person extends Model
     if values.length is 0
       total = 0
     else
-      total = _.reduce values, (memo, val) ->
+      total = values.reduce (memo, val) ->
         memo + val
     @set 'bounty', total
     @save()

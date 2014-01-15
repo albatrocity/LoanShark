@@ -19,7 +19,7 @@ module.exports = class SelectOptionView extends View
 
   render: ->
     super
-    @$el.attr 'value', @model.get(@value_attr)
-    @$el.text @label_attr
+    @el.value = @model.get(@value_attr)
+    @el.innerHTML = @label_attr
     if @model.get(@value_attr) is @src_model.get(@name)
-      @$el.attr 'selected', true
+      @el.selected = true

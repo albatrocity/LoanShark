@@ -3,4 +3,5 @@ Person     = require '/models/person'
 
 module.exports = class People extends Collection
   model: Person
-  localStorage: new Backbone.LocalStorage("ls-People")
+  url: '/people'
+  # localStorage: new Backbone.LocalStorage("ls-People")

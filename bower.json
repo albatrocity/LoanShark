@@ -6,11 +6,9 @@
     "chaplin": "~0.12.0",
     "exoskeleton": "~0.6.3",
     "console-polyfill": "~0.1.0",
-    "lodash": "~2.0.0",
-    "jquery": "~2.0.2",
     "normalize-css": "~2.1.2",
-    "h5bp-helpers": "~0.1.0",
-    "backbone.localStorage": "1.1.7"
+    "exoskeleton.localStorage": "1.0.0",
+    "davy": "0.0.5"
   },
   "overrides": {
     "chaplin": {"dependencies": {"exoskeleton": "*"}}
