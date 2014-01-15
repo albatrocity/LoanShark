@@ -1,6 +1,7 @@
-SiteView = require 'views/layout/site-view'
-People   = require 'models/people'
-Loans    = require 'models/loans'
+SiteView   = require 'views/layout/site-view'
+People     = require 'models/people'
+Loans      = require 'models/loans'
+HeaderView = require 'views/layout/header-view'
 
 module.exports = class Controller extends Chaplin.Controller
   # Compositions persist stuff between controllers.
@@ -9,3 +10,4 @@ module.exports = class Controller extends Chaplin.Controller
     Chaplin.mediator.loans.fetch()
     Chaplin.mediator.people.fetch()
     @compose 'site', SiteView
+    @compose 'header', HeaderView, region: 'header'

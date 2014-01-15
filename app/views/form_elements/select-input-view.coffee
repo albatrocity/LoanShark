@@ -28,3 +28,5 @@ module.exports = class SelectInputView extends CollectionView
       model: model
       value_attr: @value_attr
       label_attr: @label_attr
+      src_model: @model
+      name: @name

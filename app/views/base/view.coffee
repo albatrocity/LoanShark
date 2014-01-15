@@ -27,5 +27,9 @@ module.exports = class View extends Chaplin.View
     @$el.find("input, select").each (i, el) =>
       $el = $(el)
       name = $el.attr('name')
-      @model.set name, $el.val()
+      @model.set name, $el.val(), silent: true
     @publishEvent "save#{@model.constructor.name}", @model
+
+  destroy: (e, success, error) ->
+    e.preventDefault()
+    @publishEvent "destroy#{@model.constructor.name}", @model

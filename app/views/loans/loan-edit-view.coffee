@@ -16,6 +16,7 @@ module.exports = class LoanEditView extends View
       name: 'lendee_id'
       placeholder: 'Lendee'
       containerMethod: 'prepend'
+      model: @model
       label_attr: ->
         person = this.model
         person.get('first_name') + ' ' +

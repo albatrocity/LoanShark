@@ -1,8 +1,9 @@
 .loan(class="#{reconciled ? 'reconciled' : ''}")
-  = item_name
-  = " ($" + value + ")"
-
+  h3
+    = item_name
+    span.value= " ($" + value + ")"
   .person
+
   .actions
     if reconciled
       button.unreconcile(href='#') Unreconcile

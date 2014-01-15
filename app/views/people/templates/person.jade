@@ -1,7 +1,8 @@
-h3
+a(href="people/#{id}")
   = first_name
   | &nbsp;
   = last_name
-  .bounty(data-bind='bounty')
-    = bounty
-//- a(href="/people/#{id}/edit") Edit
+.controls
+  a(href="/people/#{id}/edit")
+    | Edit &nbsp;
+    = first_name

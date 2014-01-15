@@ -4,6 +4,7 @@ module.exports = class FlashMessageView extends View
   autoRender: true
   autoAttach: true
   template: require './templates/flash-message'
+  className: 'flash'
   events:
     'click .dismiss': 'dismissFlash'
 

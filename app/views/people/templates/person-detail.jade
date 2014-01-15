@@ -1,0 +1,17 @@
+h1
+  = first_name
+  | &nbsp;
+  = last_name
+.controls
+  a(href="/people/#{id}/edit")
+    | Edit &nbsp;
+    = first_name
+.details
+  h3
+    | Bounty: &nbsp;
+    span.bounty(data-bind='bounty')
+      = bounty
+.borrowed-items
+
+a(href="/people/#{id}/loans/new")
+  | Loan something to #{first_name}

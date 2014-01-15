@@ -25,3 +25,7 @@ module.exports = class Person extends Model
       total = _.reduce values, (memo, val) ->
         memo + val
     @set 'bounty', total
+    @save()
+
+  full_name: ->
+    @get('first_name') + ' ' + @get('last_name')

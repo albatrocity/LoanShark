@@ -7,6 +7,8 @@ module.exports = class SelectOptionView extends View
 
   initialize: (options) ->
     super
+    @src_model  = options.src_model
+    @name       = options.name
     @value_attr = options.value_attr
     if typeof @value_attr is 'function'
       @value_attr = @value_attr()
@@ -19,3 +21,5 @@ module.exports = class SelectOptionView extends View
     super
     @$el.attr 'value', @model.get(@value_attr)
     @$el.text @label_attr
+    if @model.get(@value_attr) is @src_model.get(@name)
+      @$el.attr 'selected', true

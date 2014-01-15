@@ -4,7 +4,7 @@ routes = require 'routes'
 # Initialize the application on DOM ready event.
 $ ->
   new Application {
-    title: 'Brunch example application',
+    title: 'Loan Shark',
     controllerSuffix: '-controller',
     routes
   }

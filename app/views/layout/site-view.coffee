@@ -20,7 +20,6 @@ module.exports = class SiteView extends View
   renderFlash: (message) ->
     @publishEvent 'dismissAlert'
     @flashMessage  = new FlashMessage(message: message)
-    console.log @flashMessage
     @flashMessageView = new FlashMessageView
       model: @flashMessage
       region: 'flash_messages'

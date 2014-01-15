@@ -4,6 +4,7 @@ Loan       = require '/models/loan'
 module.exports = class Loans extends Collection
   model: Loan
   localStorage: new Backbone.LocalStorage("ls-Loans")
+  fallbackSelector: '.empty'
   initialize: ->
     super
     @listenTo @, 'change', @sort
