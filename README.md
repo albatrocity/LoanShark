@@ -1,4 +1,9 @@
 # Loan Shark
+## About
+Loan Shark is a simple [Chaplin](http://chaplinjs.org) app for keeping track of things (or money) you loan out to friends. It uses [Exoskeleton](http://exosjs.com), a dependency-less [Backbone](http://backbonejs.org) replacement. Persistence is handled with [PouchDB](http://pouchdb.com) and a fork of [backbone-pouch](https://github.com/albatrocity/backbone-pouch) that doesn't require [Underscore](http://underscorejs.org). Currently the database is device-specific. It's your own localized data.
+
+[Brunch](http://brunch.io) is used for compiling the application and can be used as a server.
+
 ## Setup
 * clone!
 * `npm install -g brunch`
@@ -7,9 +12,5 @@
 * `brunch watch --server`
 
 ## Brunch with Chaplin
-![bwc-logo](http://brunch.io/images/svg/brunch.svg)
 
-This is HTML5 application, built with
 [Brunch](http://brunch.io) and [Chaplin](http://chaplinjs.org).
-
-* [CoffeeScript version](https://github.com/paulmillr/brunch-with-chaplin) | [JavaScript version](https://github.com/paulmillr/brunch-with-chaplin-js)
