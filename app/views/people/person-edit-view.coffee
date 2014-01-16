@@ -1,4 +1,5 @@
 View       = require 'views/base/view'
+Person     = require 'models/person'
 PeopleView = require 'views/people/people-view'
 
 module.exports = class PersonEditView extends View
@@ -6,3 +7,8 @@ module.exports = class PersonEditView extends View
   events:
     'click button.save': 'save'
     'click button.destroy': 'destroy'
+
+  save: ->
+    unless @model
+      @model = new Person()
+    super

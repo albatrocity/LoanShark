@@ -12,4 +12,4 @@ module.exports = class LoanDetailView extends LoanView
     person = Chaplin.mediator.people.get @model.get('lendee_id')
     new PersonView
       model: person
-      el: @$el.find('.person')
+      el: @el.querySelector('.person')

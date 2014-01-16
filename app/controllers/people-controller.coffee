@@ -20,40 +20,42 @@ module.exports = class LoansController extends Controller
     @view = new PeopleView region: 'main', collection: people
 
   edit: (params) ->
-    if params.id
-      model = people.get(params.id)
-      @adjustTitle "Edit #{model.full_name()}"
-    else
-      model = people.add({})
-      @adjustTitle "New Person"
-
-    @view  = new PersonEditView
-      model: model
-      region: 'main'
-      collection: people
+    @findOrFetch params.id, people, Person, (model) =>
+      if params.id
+        @adjustTitle "Edit #{model.full_name()}"
+      else
+        @adjustTitle "New Person"
+      @view  = new PersonEditView
+        model: model
+        region: 'main'
+        collection: people
 
   update: (model, success, error) ->
     name = model.get('first_name') + " " + model.get('last_name')
     if model.isNew()
-      message = "Successfully added #{name}"
+     message = "Successfully added #{name}"
     else
       message = "Successfully edited #{name}"
-    model.set('updated_at', new Date)
-    model.save model.attributes,
-      success: (model, attrs) =>
-        success(model) if success
-        @redirectTo 'person', id: model.get('id')
+
+    @udpateModel model, people,
+      success: (model) =>
+        @redirectTo 'person', id: model.get('_id')
         @publishEvent 'flash_message', message
       error: (model, err) ->
-        error(model, err) if error
+        console.log err
+        @publishEvent 'error', err
+
 
   show: (params) ->
-    model = people.get(params.id)
-    @adjustTitle "#{model.full_name()}"
-    @view  = new PersonDetailView model: model, region: 'main'
+    @findOrFetch params.id, people, Person, (model) =>
+      @adjustTitle "#{model.full_name()}"
+      @view  = new PersonDetailView model: model, region: 'main'
+
 
   destroy: (model) ->
-    model.destroy()
-    message = "#{model.get('first_name')} was sucessfully removed"
-    @redirectTo 'people'
-    @publishEvent 'flash_message', message
+    model = people.get(model)
+    model.destroy
+      success: =>
+        message = "#{model.get('first_name')} was sucessfully removed"
+        @redirectTo 'people'
+        @publishEvent 'flash_message', message

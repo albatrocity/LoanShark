@@ -15,7 +15,7 @@ module.exports = class PersonDetailView extends PersonView
 
   renderBorrowed: ->
     borrowed_items = loans.where
-      lendee_id: @model.get('id')
+      lendee_id: @model.get('_id')
     borrowed_items = new Loans(borrowed_items)
 
     loans_view = new LoansView
