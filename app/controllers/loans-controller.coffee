@@ -21,7 +21,7 @@ module.exports = class LoansController extends Controller
       model = loans.get(params.id)
       @adjustTitle "Edit #{model.get('item_name')} loan"
     else
-      model = loans.add({})
+      model = new Loan()
       @adjustTitle 'New Loan'
 
     if params.person_id
@@ -33,6 +33,7 @@ module.exports = class LoansController extends Controller
 
   update: (model, success, error) ->
     item_name = model.get('item_name')
+    model = loans.add model
     if model.isNew()
       message = "Successfully loaned out #{item_name}."
     else

@@ -26,7 +26,7 @@ module.exports = class View extends Chaplin.View
 
       text = @el.querySelector("[data-bind='#{attr_name}']")
       if text
-        text.innerHTML(@model.get(attr_name))
+        text.innerHTML = @model.get(attr_name)
 
   save: (e, success, error) ->
     # Simple binding/mapping

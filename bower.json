@@ -7,10 +7,11 @@
     "exoskeleton": "~0.6.3",
     "console-polyfill": "~0.1.0",
     "normalize-css": "~2.1.2",
-    "exoskeleton.localStorage": "1.0.0",
-    "davy": "0.0.5"
+    "pouchdb": "*",
+    "backbone-pouchdb": "git@github.com:albatrocity/backbone-pouch.git"
   },
   "overrides": {
-    "chaplin": {"dependencies": {"exoskeleton": "*"}}
+    "chaplin": {"dependencies": {"exoskeleton": "*"}},
+    "backbone-pouchdb": {"dependencies": {"exoskeleton": "*"}}
   }
 }

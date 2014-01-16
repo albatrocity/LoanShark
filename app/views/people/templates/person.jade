@@ -1,8 +1,8 @@
-a(href="people/#{id}")
+a(href="people/#{_id}")
   = first_name
   | &nbsp;
   = last_name
 .controls
-  a(href="/people/#{id}/edit")
+  a(href="/people/#{_id}/edit")
     | Edit &nbsp;
     = first_name

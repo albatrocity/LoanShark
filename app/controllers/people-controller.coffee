@@ -24,7 +24,7 @@ module.exports = class LoansController extends Controller
       model = people.get(params.id)
       @adjustTitle "Edit #{model.full_name()}"
     else
-      model = people.add({})
+      model = null
       @adjustTitle "New Person"
 
     @view  = new PersonEditView
@@ -34,7 +34,9 @@ module.exports = class LoansController extends Controller
 
   update: (model, success, error) ->
     name = model.get('first_name') + " " + model.get('last_name')
+    model = people.add model
     if model.isNew()
+      people.add model
       message = "Successfully added #{name}"
     else
       message = "Successfully edited #{name}"
@@ -42,18 +44,21 @@ module.exports = class LoansController extends Controller
     model.save model.attributes,
       success: (model, attrs) =>
         success(model) if success
-        @redirectTo 'person', id: model.get('id')
+        @redirectTo 'person', id: model.get('_id')
         @publishEvent 'flash_message', message
       error: (model, err) ->
+
         error(model, err) if error
 
   show: (params) ->
     model = people.get(params.id)
-    @adjustTitle "#{model.full_name()}"
+    # @adjustTitle "#{model.full_name()}"
     @view  = new PersonDetailView model: model, region: 'main'
 
   destroy: (model) ->
-    model.destroy()
-    message = "#{model.get('first_name')} was sucessfully removed"
-    @redirectTo 'people'
-    @publishEvent 'flash_message', message
+    model = people.get(model)
+    model.destroy
+      success: =>
+        message = "#{model.get('first_name')} was sucessfully removed"
+        @redirectTo 'people'
+        @publishEvent 'flash_message', message

@@ -14,6 +14,6 @@ module.exports = class PersonView extends View
 
   toggleControls: (e) ->
     if e.type is 'mouseover'
-      @$controls.style.display = "box"
+      @$controls.style.display = "block"
     else
       @$controls.style.display = "none"
