@@ -11,7 +11,11 @@ module.exports = class Person extends Model
 
   initialize: ->
     super
-    @calculateBounty()
+    unless @isNew()
+      @calculateBounty()
+      @addBountyListener()
+
+  addBountyListener: ->
     @listenTo Chaplin.mediator.loans, 'change remove add', (model) ->
       if model.get('lendee_id') is @get('_id')
         @calculateBounty()

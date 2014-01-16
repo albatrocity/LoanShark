@@ -17,19 +17,18 @@ module.exports = class LoansController extends Controller
     @view = new LoansView region: 'main', collection: loans, detailed: true
 
   edit: (params) ->
-    if params.id
-      model = loans.get(params.id)
-      @adjustTitle "Edit #{model.get('item_name')} loan"
-    else
-      model = new Loan()
-      @adjustTitle 'New Loan'
+    @findOrFetch params.id, loans, Loan, (model) =>
+      if params.id
+        @adjustTitle "Edit #{model.get('item_name')} loan"
+      else
+        @adjustTitle "New loan"
 
-    if params.person_id
-      model.set 'lendee_id', params.person_id
+      if params.person_id
+        model.set 'lendee_id', params.person_id
 
-    @view  = new LoanEditView
-      model: model
-      region: 'main'
+      @view  = new LoanEditView
+        model: model
+        region: 'main'
 
   update: (model, success, error) ->
     item_name = model.get('item_name')
