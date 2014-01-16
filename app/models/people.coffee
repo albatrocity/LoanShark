@@ -21,7 +21,5 @@ module.exports = class People extends Collection
           doc._deleted or doc.type is "person"
   )
   parse: (result) ->
-    console.log "People"
-    # console.log result
     result.rows.map (value) ->
       value["doc"]
