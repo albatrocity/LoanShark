@@ -1,12 +1,12 @@
 {
-  "author": "Your Name",
-  "name": "example-app",
-  "description": "Package description",
+  "author": "Ross Brown",
+  "name": "loan-shark",
+  "description": "Chaplin + Brunch demo app for being a tightwad",
   "version": "0.0.1",
-  "homepage": "",
+  "homepage": "https://github.com/albatrocity/LoanShark",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git@github.com:albatrocity/LoanShark.git"
   },
   "scripts": {
     "start": "brunch watch --server",
