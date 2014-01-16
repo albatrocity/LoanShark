@@ -9,6 +9,9 @@ module.exports = class Controller extends Chaplin.Controller
   beforeAction: ->
     @compose 'site', SiteView
     @compose 'header', HeaderView, region: 'header'
+    unless Chaplin.mediator.user.get('_id')
+      @redirectTo 'login'
+      @publishEvent 'flash_message', "We gotta know who you are, bro"
 
   findOrFetch: (id, collection, klass, cb) ->
     # Look up model in mediator collection.

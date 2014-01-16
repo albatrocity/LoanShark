@@ -6,6 +6,7 @@ module.exports = class Loan extends Model
   defaults:
     type: 'loan'
     reconciled: false
+    lender_id: ''
   reconcile: ->
     @set 'reconciled', true
     @set 'date_reconciled', new Date

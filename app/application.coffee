@@ -1,3 +1,4 @@
+Person = require 'models/person'
 People = require 'models/people'
 Loans  = require 'models/loans'
 
@@ -12,4 +13,5 @@ module.exports = class Application extends Chaplin.Application
   initMediator: ->
     Chaplin.mediator.people = new People
     Chaplin.mediator.loans  = new Loans
+    Chaplin.mediator.user   = new Person
     super
