@@ -18,8 +18,8 @@ module.exports = class SelectInputView extends CollectionView
 
   render: ->
     super
-    @$el.attr 'name', @name
-    @$el.attr 'placeholder', @placeholder
+    @el.name = @name
+    @el.placeholder = @placeholder
 
   initItemView: (model) ->
     # Override initItemView to pass value and label

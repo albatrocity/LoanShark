@@ -9,11 +9,11 @@ module.exports = class PersonView extends View
 
   render: ->
     super
-    @$controls = @$el.find(".controls")
-    @$controls.hide()
+    @$controls = @el.querySelector(".controls")
+    @$controls.style.display = "none"
 
   toggleControls: (e) ->
     if e.type is 'mouseover'
-      @$controls.show()
+      @$controls.style.display = "block"
     else
-      @$controls.hide()
+      @$controls.style.display = "none"
