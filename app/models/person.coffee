@@ -1,8 +1,6 @@
 Model = require '/models/base/model'
 
 module.exports = class Person extends Model
-  sync: BackbonePouch.sync
-    db: PouchDB('loan-shark-db')
   defaults:
     type: 'person'
     first_name: ''

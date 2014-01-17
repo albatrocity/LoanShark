@@ -7,11 +7,16 @@
     "exoskeleton": "~0.6.3",
     "console-polyfill": "~0.1.0",
     "normalize-css": "~2.1.2",
-    "pouchdb": "*",
-    "backbone-pouchdb": "git@github.com:albatrocity/backbone-pouch.git"
+    "localStorage": "git@github.com:albatrocity/Backbone.localStorage.git#1.1.8",
+    "lodash": "*"
   },
   "overrides": {
     "chaplin": {"dependencies": {"exoskeleton": "*"}},
-    "backbone-pouchdb": {"dependencies": {"exoskeleton": "*"}}
+    "localStorage": {
+      "dependencies": {
+        "exoskeleton": "*",
+        "lodash": "*"
+      }
+    }
   }
 }
