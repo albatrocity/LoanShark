@@ -12,10 +12,8 @@ module.exports = class Loans extends Collection
         include_docs: true
         fun:
           map: (doc) ->
-            emit doc.position, null  if doc.type is "loan"
-
-        limit: 10
-
+            emit doc.id, null if doc.type is "loan"
+        limit: 100
       changes:
         include_docs: true
         filter: (doc) ->

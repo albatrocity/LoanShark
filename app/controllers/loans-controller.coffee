@@ -13,6 +13,11 @@ module.exports = class LoansController extends Controller
     @subscribeEvent 'saveLoan', @update
 
   index: ->
+    loans.fetch
+      success: (a,b) ->
+        console.log 'fetch'
+        console.log a
+        console.log b
     @adjustTitle ''
     @view = new LoansView region: 'main', collection: loans, detailed: true
 

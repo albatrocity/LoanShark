@@ -43,3 +43,7 @@ module.exports = class Person extends Model
     for loan in loans
       loan.destroy()
     super
+
+  validate: (attrs, options) ->
+    if attrs.first_name is '' or attrs.first_name is undefined
+      "First Name is required"
