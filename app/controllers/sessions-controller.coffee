@@ -49,9 +49,12 @@ module.exports = class SessionsController extends Controller
     , (err, response) =>
       matches = response.rows.filter (p) ->
         return p.id if p.key is user_email
-      user = matches[0]
-      db.get user.id, (err,u) =>
-        @setCurrentUser(u)
+      if matches.length
+        user = matches[0]
+        db.get user.id, (err,u) =>
+          @setCurrentUser(u)
+      else
+        @handleUnauthorized(user_email)
 
   setCurrentUser: (attrs) ->
     current_user = Chaplin.mediator.user
@@ -59,3 +62,8 @@ module.exports = class SessionsController extends Controller
     @redirectTo 'home'
     @publishEvent 'flash_message', "You have been logged in, #{current_user.get('first_name')}"
 
+
+  handleUnauthorized: (email) ->
+    message = "Account with #{email} does not exist."
+    message = message
+    @publishEvent "flash_message", message
