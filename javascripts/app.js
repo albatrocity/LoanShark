@@ -411,14 +411,13 @@ routes = require('routes');
 
 document.onreadystatechange = function() {
   var app;
-  console.log(document.readyState);
   if (document.readyState === "complete" || document.readyState === "loaded") {
     app = new Application({
       title: 'Loan Shark',
       controllerSuffix: '-controller',
       routes: routes
     });
-    return console.log(app);
+    return window.app = app;
   }
 };
 });
