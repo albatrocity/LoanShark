@@ -409,14 +409,15 @@ Application = require('application');
 
 routes = require('routes');
 
-document.addEventListener("DOMContentLoaded", (function() {
-  document.removeEventListener("DOMContentLoaded");
-  return new Application({
-    title: 'Loan Shark',
-    controllerSuffix: '-controller',
-    routes: routes
-  });
-}), false);
+document.onreadystatechange = function() {
+  if (document.readyState === "complete" || document.readyState === "loaded") {
+    return new Application({
+      title: 'Loan Shark',
+      controllerSuffix: '-controller',
+      routes: routes
+    });
+  }
+};
 });
 
 ;require.register("lib/utils", function(exports, require, module) {
