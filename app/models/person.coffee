@@ -15,12 +15,12 @@ module.exports = class Person extends Model
 
   addBountyListener: ->
     @listenTo Chaplin.mediator.loans, 'change remove add', (model) ->
-      if model.get('lendee_id') is @get('_id')
+      if model.get('lendee_id') is @get('id')
         @calculateBounty()
 
   calculateBounty: ->
     loans = Chaplin.mediator.loans.where
-      lendee_id: @get('_id')
+      lendee_id: @get('id')
       reconciled: false
     values = loans.map (l) ->
       parseFloat(l.get('value'))
@@ -37,7 +37,7 @@ module.exports = class Person extends Model
 
   destroy: ->
     loans = Chaplin.mediator.loans.where
-      lendee_id: @get('_id')
+      lendee_id: @get('id')
     for loan in loans
       loan.destroy()
     super

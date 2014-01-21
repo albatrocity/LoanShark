@@ -33,15 +33,15 @@ module.exports = class LoansController extends Controller
   update: (model, success, error) ->
     name = model.get('first_name') + " " + model.get('last_name')
     if model.isNew()
-     message = "Successfully added #{name}"
+      message = "Successfully added #{name}"
     else
       message = "Successfully edited #{name}"
 
     @udpateModel model, people,
       success: (model) =>
-        @redirectTo 'person', id: model.get('_id')
+        @redirectTo 'person', id: model.get('id')
         @publishEvent 'flash_message', message
-      error: (model, err) ->
+      error: (model, err) =>
         console.log err
         @publishEvent 'error', err
 

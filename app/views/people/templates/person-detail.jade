@@ -3,7 +3,7 @@ h1
   | &nbsp;
   = last_name
 .controls
-  a(href="/people/#{_id}/edit")
+  a(href="/people/#{id}/edit")
     | Edit &nbsp;
     = first_name
 .details
@@ -13,5 +13,5 @@ h1
       = bounty
 .borrowed-items
 
-a(href="/people/#{_id}/loans/new")
+a(href="/people/#{id}/loans/new")
   | Loan something to #{first_name}

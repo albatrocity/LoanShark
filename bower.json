@@ -7,10 +7,10 @@
     "exoskeleton": "~0.6.3",
     "console-polyfill": "~0.1.0",
     "normalize-css": "~2.1.2",
-    "exoskeleton.localStorage": "albatrocity/exoskeleton.localStorage"
+    "backbone.localStorage": "albatrocity/exoskeleton.localStorage#179a4d2228690ede40972e55dd10d60f9ed536fe"
   },
   "overrides": {
     "chaplin":               {"dependencies": {"exoskeleton": "*"}},
-    "exoskeleton.localStorage": {"dependencies": {"exoskeleton": "*"}}
+    "backbone.localStorage": {"dependencies": {"exoskeleton": "*"}}
   }
 }

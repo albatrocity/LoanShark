@@ -1,6 +1,6 @@
 # Base model.
 module.exports = class Model extends Chaplin.Model
-  idAttribute: '_id'
+  idAttribute: 'id'
   # Mixin a synchronization state machine.
   # _(@prototype).extend Chaplin.SyncMachine
   # initialize: ->

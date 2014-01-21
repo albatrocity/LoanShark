@@ -22,10 +22,7 @@ module.exports = class Controller extends Chaplin.Controller
         collection.fetch
           success: (collection) =>
             model = collection.get(id)
-            if model
-              cb(model)
-            else
-              cb(collection.add())
+            cb(model)
     else
       model = new klass
       cb(model)
@@ -38,4 +35,4 @@ module.exports = class Controller extends Chaplin.Controller
       success: (model, attrs) =>
         options.success(model) if options.success
       error: (model, err) ->
-        error(model, err) if error
+        options.error(model, err) if options.error

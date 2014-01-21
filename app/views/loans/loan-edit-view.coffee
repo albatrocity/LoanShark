@@ -14,7 +14,7 @@ module.exports = class LoanEditView extends View
     super
     people_select = new SelectInputView
       collection: Chaplin.mediator.people
-      value_attr: '_id'
+      value_attr: 'id'
       container: @el
       name: 'lendee_id'
       placeholder: 'Lendee'
