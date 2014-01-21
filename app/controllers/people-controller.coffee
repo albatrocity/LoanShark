@@ -17,13 +17,6 @@ module.exports = class LoansController extends Controller
 
   index: ->
     @adjustTitle "People"
-    people.fetch
-      success: ->
-        console.log people
-      error: (col, err) ->
-        console.log col
-        console.log err
-
     @view = new PeopleView region: 'main', collection: people
 
   edit: (params) ->
