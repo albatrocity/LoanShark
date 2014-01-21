@@ -410,14 +410,12 @@ Application = require('application');
 routes = require('routes');
 
 document.onreadystatechange = function() {
-  var app;
   if (document.readyState === "complete" || document.readyState === "loaded") {
-    app = new Application({
+    return window.LoanShark = new Application({
       title: 'Loan Shark',
       controllerSuffix: '-controller',
       routes: routes
     });
-    return window.app = app;
   }
 };
 });
