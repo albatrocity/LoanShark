@@ -7,7 +7,7 @@
     "exoskeleton": "~0.6.3",
     "console-polyfill": "~0.1.0",
     "normalize-css": "~2.1.2",
-    "exoskeleton.localStorage": "git@github.com:albatrocity/exoskeleton.localStorage.git"
+    "exoskeleton.localStorage": "albatrocity/exoskeleton.localStorage"
   },
   "overrides": {
     "chaplin":               {"dependencies": {"exoskeleton": "*"}},
