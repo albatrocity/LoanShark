@@ -579,7 +579,7 @@ module.exports = Loan = (function(_super) {
 
   Loan.prototype.destroy = function() {
     Loan.__super__.destroy.apply(this, arguments);
-    return this.updatePerson();
+    return this.updateBounties();
   };
 
   Loan.prototype.updateBounties = function() {
