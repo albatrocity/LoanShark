@@ -19,7 +19,7 @@ module.exports = class Loan extends Model
     super
   destroy: ->
     super
-    @updatePerson()
+    @updateBounties()
   updateBounties: ->
     people = Chaplin.mediator.people
     lendee     = people.get(@get('lendee_id'))
