@@ -7,17 +7,6 @@ module.exports = class Person extends Model
     last_name: ''
     bounty: 0
 
-  initialize: ->
-    super
-    unless @isNew()
-      @calculateBounty()
-      @addBountyListener()
-
-  addBountyListener: ->
-    @listenTo Chaplin.mediator.loans, 'change remove add', (model) ->
-      if model.get('lendee_id') is @get('id')
-        @calculateBounty()
-
   calculateBounty: ->
     loans = Chaplin.mediator.loans.where
       lendee_id: @get('id')
