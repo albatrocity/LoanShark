@@ -13,3 +13,7 @@ module.exports = class Application extends Chaplin.Application
     Chaplin.mediator.people = new People
     Chaplin.mediator.loans  = new Loans
     super
+
+  initRouter: (routes, options) ->
+    # options.root = '/loan/'
+    super

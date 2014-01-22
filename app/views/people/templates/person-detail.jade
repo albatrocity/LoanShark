@@ -3,7 +3,7 @@ h1
   | &nbsp;
   = last_name
 .controls
-  a(href="/people/#{id}/edit")
+  a(href=jade.helpers.url('edit_person', {id: id}))
     | Edit &nbsp;
     = first_name
 .details
@@ -13,5 +13,5 @@ h1
       = bounty
 .borrowed-items
 
-a(href="/people/#{id}/loans/new")
+a(href=jade.helpers.url('person_new_loan', {person_id: id}))
   | Loan something to #{first_name}

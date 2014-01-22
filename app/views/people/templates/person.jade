@@ -1,8 +1,8 @@
-a(href="people/#{id}")
+a(href=jade.helpers.url('person', {id: id}))
   = first_name
   | &nbsp;
   = last_name
 .controls
-  a(href="/people/#{id}/edit")
+  a(href=jade.helpers.url('edit_person', {id: id}))
     | Edit &nbsp;
     = first_name

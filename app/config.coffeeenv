@@ -1,0 +1,7 @@
+# https://github.com/rcs/jsenv-brunch
+
+(env) ->
+  if env.PRODUCTION
+    { root: "/LoanShark/" }
+  else
+    { root: "/" }

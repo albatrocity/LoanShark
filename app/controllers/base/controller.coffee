@@ -7,8 +7,8 @@ module.exports = class Controller extends Chaplin.Controller
   # Compositions persist stuff between controllers.
   # You may also persist models etc.
   beforeAction: ->
-    @compose 'site', SiteView
-    @compose 'header', HeaderView, region: 'header'
+    @reuse 'site', SiteView
+    @reuse 'header', HeaderView, region: 'header'
 
   findOrFetch: (id, collection, klass, cb) ->
     # Look up model in mediator collection.
