@@ -573,14 +573,20 @@ module.exports = Loan = (function(_super) {
   };
 
   Loan.prototype.save = function() {
-    this.updatePerson();
+    this.updateBounties();
     return Loan.__super__.save.apply(this, arguments);
   };
 
-  Loan.prototype.updatePerson = function(model) {
-    var person;
-    person = Chaplin.mediator.people.get(this.get('lendee_id'));
-    return person.calculateBounty();
+  Loan.prototype.destroy = function() {
+    Loan.__super__.destroy.apply(this, arguments);
+    return this.updatePerson();
+  };
+
+  Loan.prototype.updateBounties = function() {
+    var lendee, people;
+    people = Chaplin.mediator.people;
+    lendee = people.get(this.get('lendee_id'));
+    return lendee.calculateBounty();
   };
 
   return Loan;
@@ -649,6 +655,16 @@ module.exports = People = (function(_super) {
   People.prototype.model = Person;
 
   People.prototype.localStorage = new Backbone.LocalStorage("loan_shark-people");
+
+  People.prototype.initialize = function() {
+    People.__super__.initialize.apply(this, arguments);
+    return this.subscribeEvent('lendee_change', this.recalcBounty);
+  };
+
+  People.prototype.recalcBounty = function(person) {
+    person = this.get(person);
+    return this.get(person).calculateBounty();
+  };
 
   return People;
 
@@ -1344,10 +1360,16 @@ module.exports = LoanEditView = (function(_super) {
   };
 
   LoanEditView.prototype.save = function() {
+    var new_lendee, old_lendee;
+    new_lendee = this.el.querySelector("[name='lendee_id']").value;
+    old_lendee = this.model.get('lendee_id');
     if (!this.model) {
       this.model = new Loan();
     }
-    return LoanEditView.__super__.save.apply(this, arguments);
+    LoanEditView.__super__.save.apply(this, arguments);
+    if (new_lendee !== old_lendee) {
+      return this.publishEvent('lendee_change', old_lendee);
+    }
   };
 
   return LoanEditView;
