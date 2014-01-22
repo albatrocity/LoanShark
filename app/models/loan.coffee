@@ -1,10 +1,10 @@
 Model = require '/models/base/model'
 
+
 module.exports = class Loan extends Model
   defaults:
     type: 'loan'
     reconciled: false
-
   reconcile: ->
     @set 'reconciled', true
     @set 'date_reconciled', new Date
@@ -15,8 +15,12 @@ module.exports = class Loan extends Model
     @save()
 
   save: ->
-    @updatePerson()
+    @updateBounties()
     super
-  updatePerson: (model) ->
-    person = Chaplin.mediator.people.get(@get('lendee_id'))
-    person.calculateBounty()
+  destroy: ->
+    super
+    @updatePerson()
+  updateBounties: ->
+    people = Chaplin.mediator.people
+    lendee     = people.get(@get('lendee_id'))
+    lendee.calculateBounty()

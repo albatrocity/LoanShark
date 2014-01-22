@@ -27,6 +27,10 @@ module.exports = class LoanEditView extends View
     @subview 'people_select', people_select
 
   save: ->
+    new_lendee = @el.querySelector("[name='lendee_id']").value
+    old_lendee = @model.get('lendee_id')
     unless @model
       @model = new Loan()
     super
+    if new_lendee != old_lendee
+      @publishEvent 'lendee_change', old_lendee
