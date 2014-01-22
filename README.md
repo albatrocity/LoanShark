@@ -11,6 +11,11 @@ Loan Shark is a simple [Chaplin](http://chaplinjs.org) app for keeping track of 
 * `bower install`
 * `brunch watch --server`
 
+## Build/Deployment
+* edit `app/config.coffeeenv` to set the root in production to whatever directory the app will be running out of.
+* run `PRODUCTION=true brunch b --production`
+* upload `public` directory to your host at your specified root
+
 ## Brunch with Chaplin
 
 [Brunch](http://brunch.io) and [Chaplin](http://chaplinjs.org).

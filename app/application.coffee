@@ -1,5 +1,6 @@
 People = require 'models/people'
 Loans  = require 'models/loans'
+config = require 'config'
 
 # The application object.
 module.exports = class Application extends Chaplin.Application
@@ -15,5 +16,5 @@ module.exports = class Application extends Chaplin.Application
     super
 
   initRouter: (routes, options) ->
-    # options.root = '/loan/'
+    options.root = config.root
     super
