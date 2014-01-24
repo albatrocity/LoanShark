@@ -12,8 +12,9 @@ module.exports = class PersonEditView extends View
     @embedded = options.embedded
   render: ->
     super
-    button = @el.querySelector('button')
-    @el.removeChild button
+    if @embedded
+      button = @el.querySelector('button')
+      @el.removeChild button
   save: ->
     unless @model
       @model = new Person()
