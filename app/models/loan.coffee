@@ -22,8 +22,8 @@ module.exports = class Loan extends Model
     @updateBounties()
   updateBounties: ->
     people = Chaplin.mediator.people
-    lendee     = people.get(@get('lendee_id'))
-    lendee.calculateBounty()
+    lendee = people.get(@get('lendee_id'))
+    lendee.calculateBounty() if lendee
 
   validate: (attrs) ->
     errors = []
