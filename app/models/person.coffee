@@ -30,3 +30,9 @@ module.exports = class Person extends Model
     for loan in loans
       loan.destroy()
     super
+
+  validate: (attrs) ->
+    errors = []
+    if attrs.first_name is '' or attrs.last_name is ''
+      errors.push "We're going to need a name to harass them by later..."
+    return errors if errors.length
