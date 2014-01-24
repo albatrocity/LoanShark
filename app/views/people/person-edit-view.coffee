@@ -7,7 +7,13 @@ module.exports = class PersonEditView extends View
   events:
     'click button.save': 'save'
     'click button.destroy': 'destroy'
-
+  initialize: (options) ->
+    super
+    @embedded = options.embedded
+  render: ->
+    super
+    button = @el.querySelector('button')
+    @el.removeChild button
   save: ->
     unless @model
       @model = new Person()

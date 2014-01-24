@@ -14,12 +14,26 @@ module.exports = class SelectInputView extends CollectionView
     @label_attr  = options.label_attr
     @name        = options.name
     @placeholder = options.placeholder
+    @extra_ops   = options.extra_options
 
 
   render: ->
     super
     @el.name = @name
     @el.placeholder = @placeholder
+    for option in @extra_ops
+      if option.method is 'append'
+        index = @subviews.length
+      else
+        index = 0
+      view = new SelectOptionView
+        model: null
+        value: option.value
+        label_attr: option.label
+        src_model: @model
+        name: @name
+
+      @insertView null, view, index
 
   initItemView: (model) ->
     # Override initItemView to pass value and label

@@ -20,6 +20,7 @@ module.exports = class PersonDetailView extends PersonView
 
     loans_view = new LoansView
       collection: borrowed_items
+      lendee: @model
       details: false
       region: 'borrowed'
 

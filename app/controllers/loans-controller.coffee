@@ -2,6 +2,7 @@ Controller = require 'controllers/base/controller'
 Loan       = require 'models/loan'
 LoansView  = require 'views/loans/loans-view'
 LoanEditView = require 'views/loans/loan-edit-view'
+Person     = require 'models/person'
 
 loans  = Chaplin.mediator.loans
 people = Chaplin.mediator.people
@@ -31,17 +32,36 @@ module.exports = class LoansController extends Controller
         region: 'main'
 
   update: (model, success, error) ->
+    if model.get('first_name') or model.get('last_name')
+      @create_person model, (person, model) =>
+        model.set 'lendee_id', person.get('id')
+        model.unset('first_name').unset('last_name')
+        @persist model
+    else
+      @persist model
+
+  create_person: (model, cb) ->
+    person = new Person
+      first_name: model.get('first_name')
+      last_name:  model.get('last_name')
+    @udpateModel person, people,
+      success: (person) =>
+        cb person, model
+      error: (model, err) =>
+        console.log err
+        @publishEvent 'error', err
+
+  persist: (model) ->
     item_name = model.get('item_name')
-    model = loans.add model
     if model.isNew()
       message = "Successfully loaned out #{item_name}."
     else
       message = "Successfully edited the loan for #{item_name}"
-    model.set('updated_at', new Date)
-    model.save model.attributes,
-      success: (model, attrs) =>
-        success(model) if success
+
+    @udpateModel model, loans,
+      success: (model) =>
         @redirectTo 'home'
         @publishEvent 'flash_message', message
-      error: (model, err) ->
-        error(model, err) if error
+      error: (model, err) =>
+        console.log err
+        @publishEvent 'error', err

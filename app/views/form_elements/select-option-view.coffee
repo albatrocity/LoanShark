@@ -10,6 +10,8 @@ module.exports = class SelectOptionView extends View
     @src_model  = options.src_model
     @name       = options.name
     @value_attr = options.value_attr
+    @value      = options.value
+
     if typeof @value_attr is 'function'
       @value_attr = @value_attr()
 
@@ -19,7 +21,12 @@ module.exports = class SelectOptionView extends View
 
   render: ->
     super
-    @el.value = @model.get(@value_attr)
     @el.innerHTML = @label_attr
-    if @model.get(@value_attr) is @src_model.get(@name)
-      @el.selected = true
+    if @model
+      # get model attribute if model
+      @el.value = @model.get(@value_attr)
+      if @model.get(@value_attr) is @src_model.get(@name)
+        @el.selected = true
+    else
+      # use supplied value for model-less options
+      @el.value = @value
