@@ -31,6 +31,7 @@ module.exports = class LoanEditView extends View
         person.get('first_name') + ' ' +
         person.get('last_name')
     @subview 'people_select', people_select
+    @checkOption()
 
   save: ->
     new_lendee = @el.querySelector("[name='lendee_id']").value
@@ -42,7 +43,7 @@ module.exports = class LoanEditView extends View
       @publishEvent 'lendee_change', old_lendee
 
   checkOption: (e) ->
-    select = event.delegateTarget
+    select = @subview('people_select').el
     if select.value is 'new-person'
       person_view = new PersonEditView
         region: 'new_person'
