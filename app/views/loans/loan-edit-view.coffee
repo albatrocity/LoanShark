@@ -51,3 +51,6 @@ module.exports = class LoanEditView extends View
       @subview 'new_person', person_view
     else
       @removeSubview 'new_person' if @subview 'new_person'
+
+  handleKeys: (e) ->
+    if e.keyCode == 13 then @save()
