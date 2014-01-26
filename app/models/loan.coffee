@@ -24,3 +24,7 @@ module.exports = class Loan extends Model
     people = Chaplin.mediator.people
     lendee     = people.get(@get('lendee_id'))
     lendee.calculateBounty()
+
+  getDaysPastDue: ->
+    dateDiff = new Date() - new Date(@get 'created_at')
+    Math.floor dateDiff/86400000

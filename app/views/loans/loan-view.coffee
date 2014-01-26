@@ -7,6 +7,12 @@ module.exports = class LoanView extends View
     "click .reconcile"   : "reconcile"
     "click .unreconcile" : "unreconcile"
 
+  render: ->
+    super
+
+    if @model.get('created_at')
+      @el.querySelector('.daysPastDue').innerHTML = @model.getDaysPastDue()
+
   destroy: (e) ->
     e.preventDefault()
     @model.destroy()

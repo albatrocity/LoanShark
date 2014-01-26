@@ -29,6 +29,7 @@ module.exports = class Controller extends Chaplin.Controller
 
   udpateModel: (model, collection, options) ->
     if model.isNew()
+      model.set('created_at', new Date)
       collection.add model
     model.set('updated_at', new Date)
     model.save model.attributes,
