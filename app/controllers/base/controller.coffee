@@ -28,9 +28,9 @@ module.exports = class Controller extends Chaplin.Controller
       cb(model)
 
   udpateModel: (model, collection, options) ->
-    if model.isValid()
-      if model.isNew()
-        collection.add model
+    if model.isNew() and model.isValid()
+      model.set('created_at', new Date)
+      collection.add model
     model.set('updated_at', new Date)
     model.save model.attributes,
       success: (model, attrs) =>
