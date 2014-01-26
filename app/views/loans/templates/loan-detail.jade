@@ -1,10 +1,16 @@
 .loan(class="#{reconciled ? 'reconciled' : ''}")
   h3
     = item_name
-    span.value= " ($" + value + ")"
-
-  h5 Days Past Due: 
-    span.daysPastDue
+    span  ($
+    span.compoundValue
+    span )
+  ul
+    li Original Value: 
+      span.value= " $" + value 
+    li Days Past Due: 
+      span.daysPastDue
+    li Compound Interest Accrued: $
+      span.compoundInterest
 
   .person
 

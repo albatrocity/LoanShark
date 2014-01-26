@@ -9,9 +9,9 @@ module.exports = class LoanView extends View
 
   render: ->
     super
-
-    if @model.get('created_at')
-      @el.querySelector('.daysPastDue').innerHTML = @model.getDaysPastDue()
+    @el.querySelector('.daysPastDue').innerHTML = @model.getDaysPastDue()
+    @el.querySelector('.compoundInterest').innerHTML = @model.calculateInterest()
+    @el.querySelector('.compoundValue').innerHTML = @model.getTotalValue()
 
   destroy: (e) ->
     e.preventDefault()
