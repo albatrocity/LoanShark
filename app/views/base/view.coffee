@@ -29,6 +29,7 @@ module.exports = class View extends Chaplin.View
         text.innerHTML = @model.get(attr_name)
 
   save: (e, success, error) ->
+    e.preventDefault()
     # Simple binding/mapping
     input_els = []
     for el in @el.getElementsByTagName("input")

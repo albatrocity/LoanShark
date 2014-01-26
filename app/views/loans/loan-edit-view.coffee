@@ -7,7 +7,7 @@ Loan            = require 'models/loan'
 module.exports = class LoanEditView extends View
   template: require './templates/loan-edit'
   events:
-    'click button': 'save'
+    'submit form': 'save'
     'change select': 'checkOption'
   regions:
     people: '.people'
@@ -33,7 +33,7 @@ module.exports = class LoanEditView extends View
     @subview 'people_select', people_select
     @checkOption()
 
-  save: ->
+  save: (e) ->
     new_lendee = @el.querySelector("[name='lendee_id']").value
     old_lendee = @model.get('lendee_id')
     unless @model
@@ -51,6 +51,3 @@ module.exports = class LoanEditView extends View
       @subview 'new_person', person_view
     else
       @removeSubview 'new_person' if @subview 'new_person'
-
-  handleKeys: (e) ->
-    if e.keyCode == 13 then @save()
