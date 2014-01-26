@@ -2052,7 +2052,7 @@ _.extend(History.prototype, Events, {
 });
 
 ;/*!
- * Chaplin 0.13.0
+ * Chaplin 1.0.0
  *
  * Chaplin may be freely distributed under the MIT license.
  * For all details and documentation:
@@ -2368,18 +2368,20 @@ module.exports = Dispatcher = (function() {
   };
 
   Dispatcher.prototype.controllerLoaded = function(route, params, options, Controller) {
-    var controller, previous;
-    this.nextPreviousRoute = this.currentRoute;
-    previous = _.extend({}, this.nextPreviousRoute);
-    if (this.currentParams != null) {
-      previous.params = this.currentParams;
+    var controller, prev, previous;
+    if (this.nextPreviousRoute = this.currentRoute) {
+      previous = _.extend({}, this.nextPreviousRoute);
+      if (this.currentParams != null) {
+        previous.params = this.currentParams;
+      }
+      if (previous.previous) {
+        delete previous.previous;
+      }
+      prev = {
+        previous: previous
+      };
     }
-    if (previous.previous) {
-      delete previous.previous;
-    }
-    this.nextCurrentRoute = _.extend({}, route, {
-      previous: previous
-    });
+    this.nextCurrentRoute = _.extend({}, route, prev);
     controller = new Controller(params, this.nextCurrentRoute, options);
     return this.executeBeforeAction(controller, this.nextCurrentRoute, params, options);
   };
@@ -4142,7 +4144,7 @@ module.exports = Route = (function() {
   };
 
   Route.prototype.reverse = function(params, query) {
-    var name, queryString, url, value, _i, _j, _len, _len1, _ref, _ref1;
+    var name, queryString, raw, url, value, _i, _j, _len, _len1, _ref, _ref1;
     params = this.normalizeParams(params);
     if (params === false) {
       return false;
@@ -4161,14 +4163,14 @@ module.exports = Route = (function() {
         url = url.replace(RegExp("[:*]" + name, "g"), value);
       }
     }
-    url = url.replace(optionalRegExp, function(match, portion) {
+    raw = url.replace(optionalRegExp, function(match, portion) {
       if (portion.match(/[:*]/g)) {
         return "";
       } else {
         return portion;
       }
     });
-    url = processTrailingSlash(url, this.options.trailing);
+    url = processTrailingSlash(raw, this.options.trailing);
     if (!query) {
       return url;
     }
@@ -4247,7 +4249,7 @@ module.exports = Route = (function() {
       _this.requiredParams.push(param);
       return _this.paramCapturePattern(match);
     });
-    return this.regExp = RegExp("^" + pattern + "(?=\\/?(\\?|$))");
+    return this.regExp = RegExp("^" + pattern + "(?=\\/?(?=\\?|$))");
   };
 
   Route.prototype.parseOptionalPortion = function(match, optionalPortion) {

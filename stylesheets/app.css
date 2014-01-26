@@ -405,11 +405,21 @@ table {
     border-spacing: 0;
 }
 
+.errors .error {
+  background: #92535c;
+  color: #dbe1eb;
+  padding: 0.5em 1em;
+  margin-bottom: 0.5em;
+  -webkit-border-radius: 1em;
+  border-radius: 1em;
+}
+
 #flash_messages {
   width: 551px;
-  margin: 1em auto;
+  margin: 0 auto;
 }
 #flash_messages .flash {
+  margin-top: 1em;
   background: #13b670;
   padding: 0.5em;
   text-align: center;
@@ -487,7 +497,8 @@ h3,
 h4 {
   color: #dbe1eb;
 }
-a {
+a,
+li {
   color: #333d46;
 }
 .page-container a:visited {
@@ -509,16 +520,24 @@ a {
 .page-container .empty h2 a,
 .page-container .empty h3 a,
 .page-container .empty h4 a {
-  background: #7fc4d6;
-  border-radius: 0.4em;
-  padding: 0.5em;
+  color: #7fc4d6;
   text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.page-container .empty h1 a:hover,
+.page-container .empty h2 a:hover,
+.page-container .empty h3 a:hover,
+.page-container .empty h4 a:hover {
+  border-color: #7fc4d6;
 }
 
 .loan {
   padding: 1em;
   margin-top: 1em;
   background: #7fc4d6;
+}
+.loan h3 {
+  margin: 0 0 0.7em 0;
 }
 .loan.reconciled {
   opacity: 0.3;
@@ -534,6 +553,14 @@ a {
 }
 .loan .person {
   padding: 0;
+}
+.loan .stats {
+  list-style-type: none;
+  font-size: 90%;
+  margin-top: 0;
+  margin-bottom: 1.5em;
+  padding-left: 1.5em;
+  line-height: 1.5em;
 }
 
 .person {

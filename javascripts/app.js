@@ -186,7 +186,8 @@ module.exports = Controller = (function(_super) {
 
   Controller.prototype.udpateModel = function(model, collection, options) {
     var _this = this;
-    if (model.isNew()) {
+    if (model.isNew() && model.isValid()) {
+      model.set('created_at', new Date);
       collection.add(model);
     }
     model.set('updated_at', new Date);
@@ -197,6 +198,7 @@ module.exports = Controller = (function(_super) {
         }
       },
       error: function(model, err) {
+        this.publishEvent('render_error', err);
         if (options.error) {
           return options.error(model, err);
         }
@@ -210,7 +212,7 @@ module.exports = Controller = (function(_super) {
 });
 
 ;require.register("controllers/loans-controller", function(exports, require, module) {
-var Controller, Loan, LoanEditView, LoansController, LoansView, loans, people, _ref,
+var Controller, Loan, LoanEditView, LoansController, LoansView, Person, loans, people, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -221,6 +223,8 @@ Loan = require('models/loan');
 LoansView = require('views/loans/loans-view');
 
 LoanEditView = require('views/loans/loan-edit-view');
+
+Person = require('models/person');
 
 loans = Chaplin.mediator.loans;
 
@@ -267,28 +271,53 @@ module.exports = LoansController = (function(_super) {
   };
 
   LoansController.prototype.update = function(model, success, error) {
+    var _this = this;
+    if (model.get('first_name') || model.get('last_name')) {
+      return this.create_person(model, function(person, model) {
+        model.set('lendee_id', person.get('id'));
+        model.unset('first_name').unset('last_name');
+        return _this.persist(model);
+      });
+    } else {
+      return this.persist(model);
+    }
+  };
+
+  LoansController.prototype.create_person = function(model, cb) {
+    var person,
+      _this = this;
+    person = new Person({
+      first_name: model.get('first_name'),
+      last_name: model.get('last_name')
+    });
+    return this.udpateModel(person, people, {
+      success: function(person) {
+        return cb(person, model);
+      },
+      error: function(model, err) {
+        console.log(err);
+        return _this.publishEvent('render_error', err);
+      }
+    });
+  };
+
+  LoansController.prototype.persist = function(model) {
     var item_name, message,
       _this = this;
     item_name = model.get('item_name');
-    model = loans.add(model);
     if (model.isNew()) {
       message = "Successfully loaned out " + item_name + ".";
     } else {
       message = "Successfully edited the loan for " + item_name;
     }
-    model.set('updated_at', new Date);
-    return model.save(model.attributes, {
-      success: function(model, attrs) {
-        if (success) {
-          success(model);
-        }
+    return this.udpateModel(model, loans, {
+      success: function(model) {
         _this.redirectTo('home');
         return _this.publishEvent('flash_message', message);
       },
       error: function(model, err) {
-        if (error) {
-          return error(model, err);
-        }
+        console.log(err);
+        return _this.publishEvent('render_error', err);
       }
     });
   };
@@ -374,8 +403,7 @@ module.exports = LoansController = (function(_super) {
         return _this.publishEvent('flash_message', message);
       },
       error: function(model, err) {
-        console.log(err);
-        return _this.publishEvent('error', err);
+        return _this.publishEvent('render_error', err);
       }
     });
   };
@@ -495,6 +523,54 @@ module.exports = Model = (function(_super) {
 })(Chaplin.Model);
 });
 
+;require.register("models/error", function(exports, require, module) {
+var Error, Model, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Model = require('./base/model');
+
+module.exports = Error = (function(_super) {
+  __extends(Error, _super);
+
+  function Error() {
+    _ref = Error.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Error.prototype.defaults = {
+    text: "Something went wrong"
+  };
+
+  return Error;
+
+})(Model);
+});
+
+;require.register("models/errors", function(exports, require, module) {
+var Collection, Error, Errors, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Error = require('models/error');
+
+Collection = require('./base/collection');
+
+module.exports = Errors = (function(_super) {
+  __extends(Errors, _super);
+
+  function Errors() {
+    _ref = Errors.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Errors.prototype.model = Error;
+
+  return Errors;
+
+})(Collection);
+});
+
 ;require.register("models/flash-message", function(exports, require, module) {
 var FlashMessage, Model, _ref,
   __hasProp = {}.hasOwnProperty,
@@ -557,7 +633,8 @@ module.exports = Loan = (function(_super) {
 
   Loan.prototype.defaults = {
     type: 'loan',
-    reconciled: false
+    reconciled: false,
+    interest_rate: .2
   };
 
   Loan.prototype.reconcile = function() {
@@ -573,7 +650,9 @@ module.exports = Loan = (function(_super) {
   };
 
   Loan.prototype.save = function() {
-    this.updateBounties();
+    if (this.isValid()) {
+      this.updateBounties();
+    }
     return Loan.__super__.save.apply(this, arguments);
   };
 
@@ -586,7 +665,53 @@ module.exports = Loan = (function(_super) {
     var lendee, people;
     people = Chaplin.mediator.people;
     lendee = people.get(this.get('lendee_id'));
-    return lendee.calculateBounty();
+    if (lendee) {
+      return lendee.calculateBounty();
+    }
+  };
+
+  Loan.prototype.getDaysPastDue = function() {
+    var dateDiff;
+    if (this.get('created_at')) {
+      dateDiff = new Date() - new Date(this.get('created_at'));
+      return Math.floor(dateDiff / 86400000);
+    } else {
+      return 0;
+    }
+  };
+
+  Loan.prototype.calculateInterest = function() {
+    var days, daysPastDue, initialValue, interest, totalOwed, _i;
+    initialValue = parseInt(this.get('value'));
+    totalOwed = initialValue;
+    interest = this.get('interest_rate');
+    daysPastDue = this.getDaysPastDue();
+    if (daysPastDue !== 0) {
+      for (days = _i = 1; 1 <= daysPastDue ? _i <= daysPastDue : _i >= daysPastDue; days = 1 <= daysPastDue ? ++_i : --_i) {
+        totalOwed += totalOwed * interest;
+      }
+      return totalOwed - initialValue;
+    } else {
+      return 0;
+    }
+  };
+
+  Loan.prototype.getTotalValue = function() {
+    return parseInt(this.get('value')) + this.calculateInterest();
+  };
+
+  Loan.prototype.validate = function(attrs) {
+    var errors;
+    errors = [];
+    if (attrs.item_name === '') {
+      errors.push("Make a note of what the loan is for. That description field is required.");
+    }
+    if (attrs.value === '') {
+      errors.push("Add a value so we can calculate a bounty on this person's head.");
+    }
+    if (errors.length) {
+      return errors;
+    }
   };
 
   return Loan;
@@ -729,6 +854,17 @@ module.exports = Person = (function(_super) {
     return Person.__super__.destroy.apply(this, arguments);
   };
 
+  Person.prototype.validate = function(attrs) {
+    var errors;
+    errors = [];
+    if (attrs.first_name === '' || attrs.last_name === '') {
+      errors.push("We're going to need a name to harass them by later...");
+    }
+    if (errors.length) {
+      return errors;
+    }
+  };
+
   return Person;
 
 })(Model);
@@ -801,6 +937,83 @@ module.exports = CollectionView = (function(_super) {
 })(Chaplin.CollectionView);
 });
 
+;require.register("views/base/form-view", function(exports, require, module) {
+var Error, ErrorsCollection, ErrorsView, FormView, View, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+View = require('./view');
+
+ErrorsCollection = require('models/errors');
+
+ErrorsView = require('views/errors/errors-view');
+
+Error = require('models/error');
+
+module.exports = FormView = (function(_super) {
+  __extends(FormView, _super);
+
+  function FormView() {
+    _ref = FormView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  FormView.prototype.autoRender = true;
+
+  FormView.prototype.regions = {
+    'errors': '.errors'
+  };
+
+  FormView.prototype.initialize = function() {
+    FormView.__super__.initialize.apply(this, arguments);
+    this.errors = new ErrorsCollection();
+    return this.subscribeEvent('render_error', this.renderError);
+  };
+
+  FormView.prototype.render = function() {
+    var _this = this;
+    FormView.__super__.render.apply(this, arguments);
+    this.errors_view = new ErrorsView({
+      collection: this.errors,
+      container: this.el.querySelector('.errors'),
+      autoRender: true
+    });
+    if (this.model) {
+      return this.listenTo(this.model, 'invalid', function(model, error) {
+        return _this.renderError(error);
+      });
+    }
+  };
+
+  FormView.prototype.renderError = function(error, model) {
+    var err, errorObj, _i, _len, _results;
+    this.errors.reset();
+    this.errors_view.render();
+    if (typeof error === 'string') {
+      errorObj = {
+        text: error
+      };
+      return this.errors.add(errorObj);
+    } else if (typeof error === 'object') {
+      _results = [];
+      for (_i = 0, _len = error.length; _i < _len; _i++) {
+        err = error[_i];
+        errorObj = {
+          text: err
+        };
+        _results.push(this.errors.add(errorObj));
+      }
+      return _results;
+    } else {
+      return console.log(error);
+    }
+  };
+
+  return FormView;
+
+})(View);
+});
+
 ;require.register("views/base/view", function(exports, require, module) {
 var View, _ref,
   __hasProp = {}.hasOwnProperty,
@@ -863,6 +1076,7 @@ module.exports = View = (function(_super) {
   View.prototype.save = function(e, success, error) {
     var el, input_els, _i, _j, _len, _len1, _ref1, _ref2,
       _this = this;
+    e.preventDefault();
     input_els = [];
     _ref1 = this.el.getElementsByTagName("input");
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
@@ -894,6 +1108,121 @@ module.exports = View = (function(_super) {
 })(Chaplin.View);
 });
 
+;require.register("views/errors/error-view", function(exports, require, module) {
+var ErrorView, View, template, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+View = require('views/base/view');
+
+template = require('./templates/show');
+
+module.exports = ErrorView = (function(_super) {
+  __extends(ErrorView, _super);
+
+  function ErrorView() {
+    _ref = ErrorView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  ErrorView.prototype.template = template;
+
+  ErrorView.prototype.className = 'error';
+
+  ErrorView.prototype.autoRender = true;
+
+  ErrorView.prototype.autoAttach = true;
+
+  ErrorView.prototype.render = function() {
+    return ErrorView.__super__.render.apply(this, arguments);
+  };
+
+  return ErrorView;
+
+})(View);
+});
+
+;require.register("views/errors/errors-view", function(exports, require, module) {
+var CollectionView, ErrorView, ErrorsView, template, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+CollectionView = require('views/base/collection-view');
+
+ErrorView = require('./error-view');
+
+template = require('./templates/collection');
+
+module.exports = ErrorsView = (function(_super) {
+  __extends(ErrorsView, _super);
+
+  function ErrorsView() {
+    _ref = ErrorsView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  ErrorsView.prototype.itemView = ErrorView;
+
+  ErrorsView.prototype.animationDuration = 0;
+
+  ErrorsView.prototype.listen = {
+    'add collection': 'showView'
+  };
+
+  ErrorsView.prototype.render = function() {
+    ErrorsView.__super__.render.apply(this, arguments);
+    if (this.collection.length === 0) {
+      return this.el.style.display = 'none';
+    }
+  };
+
+  ErrorsView.prototype.showView = function() {
+    if (this.collection.length > 0) {
+      return this.el.style.display = '';
+    }
+  };
+
+  return ErrorsView;
+
+})(CollectionView);
+});
+
+;require.register("views/errors/templates/collection", function(exports, require, module) {
+var __templateData = function template(locals) {
+var buf = [];
+var jade_mixins = {};
+
+buf.push("<div class=\"list\"></div>");;return buf.join("");
+};
+if (typeof define === 'function' && define.amd) {
+  define([], function() {
+    return __templateData;
+  });
+} else if (typeof module === 'object' && module && module.exports) {
+  module.exports = __templateData;
+} else {
+  __templateData;
+}
+});
+
+;require.register("views/errors/templates/show", function(exports, require, module) {
+var __templateData = function template(locals) {
+var buf = [];
+var jade_mixins = {};
+var locals_ = (locals || {}),text = locals_.text;
+buf.push(jade.escape(null == (jade.interp = text) ? "" : jade.interp));;return buf.join("");
+};
+if (typeof define === 'function' && define.amd) {
+  define([], function() {
+    return __templateData;
+  });
+} else if (typeof module === 'object' && module && module.exports) {
+  module.exports = __templateData;
+} else {
+  __templateData;
+}
+});
+
 ;require.register("views/form_elements/select-input-view", function(exports, require, module) {
 var CollectionView, SelectInputView, SelectOptionView, _ref,
   __hasProp = {}.hasOwnProperty,
@@ -922,13 +1251,34 @@ module.exports = SelectInputView = (function(_super) {
     this.value_attr = options.value_attr;
     this.label_attr = options.label_attr;
     this.name = options.name;
-    return this.placeholder = options.placeholder;
+    this.placeholder = options.placeholder;
+    return this.extra_ops = options.extra_options;
   };
 
   SelectInputView.prototype.render = function() {
+    var index, option, view, _i, _len, _ref1, _results;
     SelectInputView.__super__.render.apply(this, arguments);
     this.el.name = this.name;
-    return this.el.placeholder = this.placeholder;
+    this.el.placeholder = this.placeholder;
+    _ref1 = this.extra_ops;
+    _results = [];
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      option = _ref1[_i];
+      if (option.method === 'append') {
+        index = this.subviews.length;
+      } else {
+        index = 0;
+      }
+      view = new SelectOptionView({
+        model: null,
+        value: option.value,
+        label_attr: option.label,
+        src_model: this.model,
+        name: this.name
+      });
+      _results.push(this.insertView(null, view, index));
+    }
+    return _results;
   };
 
   SelectInputView.prototype.initItemView = function(model) {
@@ -972,6 +1322,7 @@ module.exports = SelectOptionView = (function(_super) {
     this.src_model = options.src_model;
     this.name = options.name;
     this.value_attr = options.value_attr;
+    this.value = options.value;
     if (typeof this.value_attr === 'function') {
       this.value_attr = this.value_attr();
     }
@@ -983,10 +1334,14 @@ module.exports = SelectOptionView = (function(_super) {
 
   SelectOptionView.prototype.render = function() {
     SelectOptionView.__super__.render.apply(this, arguments);
-    this.el.value = this.model.get(this.value_attr);
     this.el.innerHTML = this.label_attr;
-    if (this.model.get(this.value_attr) === this.src_model.get(this.name)) {
-      return this.el.selected = true;
+    if (this.model) {
+      this.el.value = this.model.get(this.value_attr);
+      if (this.model.get(this.value_attr) === this.src_model.get(this.name)) {
+        return this.el.selected = true;
+      }
+    } else {
+      return this.el.value = this.value;
     }
   };
 
@@ -1291,7 +1646,10 @@ module.exports = LoanDetailView = (function(_super) {
 
   LoanDetailView.prototype.render = function() {
     LoanDetailView.__super__.render.apply(this, arguments);
-    return this.renderUserView();
+    this.renderUserView();
+    this.el.querySelector('.daysPastDue').innerHTML = this.model.getDaysPastDue();
+    this.el.querySelector('.compoundInterest').innerHTML = this.model.calculateInterest();
+    return this.el.querySelector('.compoundValue').innerHTML = this.model.getTotalValue();
   };
 
   LoanDetailView.prototype.renderUserView = function() {
@@ -1309,13 +1667,15 @@ module.exports = LoanDetailView = (function(_super) {
 });
 
 ;require.register("views/loans/loan-edit-view", function(exports, require, module) {
-var Loan, LoanEditView, PeopleView, SelectInputView, View, _ref,
+var Loan, LoanEditView, PeopleView, PersonEditView, SelectInputView, View, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-View = require('views/base/view');
+View = require('views/base/form-view');
 
 PeopleView = require('views/people/people-view');
+
+PersonEditView = require('views/people/person-edit-view');
 
 SelectInputView = require('views/form_elements/select-input-view');
 
@@ -1332,11 +1692,13 @@ module.exports = LoanEditView = (function(_super) {
   LoanEditView.prototype.template = require('./templates/loan-edit');
 
   LoanEditView.prototype.events = {
-    'click button': 'save'
+    'submit form': 'save',
+    'change select': 'checkOption'
   };
 
   LoanEditView.prototype.regions = {
-    people: '.people'
+    people: '.people',
+    new_person: '.new-person'
   };
 
   LoanEditView.prototype.render = function() {
@@ -1345,6 +1707,13 @@ module.exports = LoanEditView = (function(_super) {
     people_select = new SelectInputView({
       collection: Chaplin.mediator.people,
       value_attr: 'id',
+      extra_options: [
+        {
+          label: '> Somebody new <',
+          value: 'new-person',
+          method: 'append'
+        }
+      ],
       container: this.el,
       name: 'lendee_id',
       placeholder: 'Lendee',
@@ -1356,10 +1725,11 @@ module.exports = LoanEditView = (function(_super) {
         return person.get('first_name') + ' ' + person.get('last_name');
       }
     });
-    return this.subview('people_select', people_select);
+    this.subview('people_select', people_select);
+    return this.checkOption();
   };
 
-  LoanEditView.prototype.save = function() {
+  LoanEditView.prototype.save = function(e) {
     var new_lendee, old_lendee;
     new_lendee = this.el.querySelector("[name='lendee_id']").value;
     old_lendee = this.model.get('lendee_id');
@@ -1367,8 +1737,24 @@ module.exports = LoanEditView = (function(_super) {
       this.model = new Loan();
     }
     LoanEditView.__super__.save.apply(this, arguments);
-    if (new_lendee !== old_lendee) {
+    if (old_lendee && new_lendee !== old_lendee && this.model.isValid()) {
       return this.publishEvent('lendee_change', old_lendee);
+    }
+  };
+
+  LoanEditView.prototype.checkOption = function(e) {
+    var person_view, select;
+    select = this.subview('people_select').el;
+    if (select.value === 'new-person') {
+      person_view = new PersonEditView({
+        region: 'new_person',
+        embedded: true
+      });
+      return this.subview('new_person', person_view);
+    } else {
+      if (this.subview('new_person')) {
+        return this.removeSubview('new_person');
+      }
     }
   };
 
@@ -1398,6 +1784,10 @@ module.exports = LoanView = (function(_super) {
     "click .destroy": "destroy",
     "click .reconcile": "reconcile",
     "click .unreconcile": "unreconcile"
+  };
+
+  LoanView.prototype.render = function() {
+    return LoanView.__super__.render.apply(this, arguments);
   };
 
   LoanView.prototype.destroy = function(e) {
@@ -1447,15 +1837,29 @@ module.exports = LoansView = (function(_super) {
 
   LoansView.prototype.listSelector = '.loans';
 
+  LoansView.prototype.fallbackSelector = '.empty';
+
   LoansView.prototype.initialize = function(options) {
     LoansView.__super__.initialize.apply(this, arguments);
+    this.lendee = options.lendee;
     return this.detailed = options.detailed;
+  };
+
+  LoansView.prototype.render = function() {
+    var loan_link;
+    LoansView.__super__.render.apply(this, arguments);
+    if (this.lendee) {
+      this.el.querySelector('.target-lendee').innerHTML = this.lendee.get('first_name');
+      loan_link = this.el.querySelector('.new-loan-link');
+      return loan_link.parentNode.removeChild(loan_link);
+    }
   };
 
   LoansView.prototype.initItemView = function(model) {
     if (this.detailed) {
       return new LoanDetailView({
-        model: model
+        model: model,
+        details: true
       });
     } else {
       return new LoanView({
@@ -1474,7 +1878,7 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var locals_ = (locals || {}),reconciled = locals_.reconciled,item_name = locals_.item_name,value = locals_.value,id = locals_.id;
-buf.push("<div" + (jade.cls(['loan',"" + (reconciled ? 'reconciled' : '') + ""], [null,true])) + "><h3>" + (jade.escape(null == (jade.interp = item_name) ? "" : jade.interp)) + "<span class=\"value\">" + (jade.escape(null == (jade.interp = " ($" + value + ")") ? "" : jade.interp)) + "</span></h3><div class=\"person\"></div><div class=\"actions\">");
+buf.push("<div" + (jade.cls(['loan',"" + (reconciled ? 'reconciled' : '') + ""], [null,true])) + "><h3>" + (jade.escape(null == (jade.interp = item_name) ? "" : jade.interp)) + "<span> ($</span><span class=\"compoundValue\"></span><span>)</span></h3><ul class=\"stats\"><li>Original Value: <span class=\"value\">" + (jade.escape(null == (jade.interp = " $" + value ) ? "" : jade.interp)) + "</span></li><li>Days Past Due: <span class=\"daysPastDue\"></span></li><li>Compound Interest Accrued: $<span class=\"compoundInterest\"></span></li></ul><div class=\"person\"></div><div class=\"actions\">");
 if ( reconciled)
 {
 buf.push("<button href=\"#\" class=\"unreconcile\">Unreconcile</button>");
@@ -1501,7 +1905,7 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 
-buf.push("<div class=\"people\"></div><br/><input name=\"item_name\" placeholder=\"Item Name\"/><input name=\"value\" placeholder=\"Value\"/><button>Save</button>");;return buf.join("");
+buf.push("<form><div class=\"errors\"></div><div class=\"people\"></div><div class=\"new-person\"></div><br/><input name=\"item_name\" placeholder=\"Item Name or description\"/><input name=\"value\" placeholder=\"$ Value\" type=\"number\"/><button>Save</button></form>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1546,7 +1950,7 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 
-buf.push("<div class=\"loans\"></div>");;return buf.join("");
+buf.push("<div class=\"loans\"></div><div class=\"empty\"><h4>You don't have power over&nbsp;<span class=\"target-lendee\">anyone.&nbsp;</span><a" + (jade.attr("href", jade.helpers.url('new_loan'), true, false)) + " class=\"new-loan-link\">Loan something out.</a></h4></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1560,13 +1964,15 @@ if (typeof define === 'function' && define.amd) {
 });
 
 ;require.register("views/people/people-view", function(exports, require, module) {
-var CollectionView, PeopleView, PersonView, _ref,
+var CollectionView, PeopleView, PersonView, template, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 CollectionView = require('views/base/collection-view');
 
 PersonView = require('views/people/person-view');
+
+template = require('views/people/templates/people');
 
 module.exports = PeopleView = (function(_super) {
   __extends(PeopleView, _super);
@@ -1577,6 +1983,12 @@ module.exports = PeopleView = (function(_super) {
   }
 
   PeopleView.prototype.itemView = PersonView;
+
+  PeopleView.prototype.template = template;
+
+  PeopleView.prototype.listSelector = '.people';
+
+  PeopleView.prototype.fallbackSelector = '.empty';
 
   return PeopleView;
 
@@ -1625,6 +2037,7 @@ module.exports = PersonDetailView = (function(_super) {
     borrowed_items = new Loans(borrowed_items);
     loans_view = new LoansView({
       collection: borrowed_items,
+      lendee: this.model,
       details: false,
       region: 'borrowed'
     });
@@ -1641,7 +2054,7 @@ var PeopleView, Person, PersonEditView, View, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-View = require('views/base/view');
+View = require('views/base/form-view');
 
 Person = require('models/person');
 
@@ -1658,11 +2071,26 @@ module.exports = PersonEditView = (function(_super) {
   PersonEditView.prototype.template = require('./templates/person-edit');
 
   PersonEditView.prototype.events = {
-    'click button.save': 'save',
+    'submit form': 'save',
     'click button.destroy': 'destroy'
   };
 
-  PersonEditView.prototype.save = function() {
+  PersonEditView.prototype.initialize = function(options) {
+    PersonEditView.__super__.initialize.apply(this, arguments);
+    return this.embedded = options.embedded;
+  };
+
+  PersonEditView.prototype.render = function() {
+    var button;
+    PersonEditView.__super__.render.apply(this, arguments);
+    if (this.embedded) {
+      button = this.el.querySelector('button');
+      return this.el.removeChild(button);
+    }
+  };
+
+  PersonEditView.prototype.save = function(e) {
+    e.preventDefault();
     if (!this.model) {
       this.model = new Person();
     }
@@ -1717,6 +2145,24 @@ module.exports = PersonView = (function(_super) {
 })(View);
 });
 
+;require.register("views/people/templates/people", function(exports, require, module) {
+var __templateData = function template(locals) {
+var buf = [];
+var jade_mixins = {};
+
+buf.push("<div class=\"people\"></div><div class=\"empty\"><h4>What, do you not know anyone?&nbsp;<a" + (jade.attr("href", jade.helpers.url('new_person'), true, false)) + ">Add some people,&nbsp;</a>loser.</h4></div>");;return buf.join("");
+};
+if (typeof define === 'function' && define.amd) {
+  define([], function() {
+    return __templateData;
+  });
+} else if (typeof module === 'object' && module && module.exports) {
+  module.exports = __templateData;
+} else {
+  __templateData;
+}
+});
+
 ;require.register("views/people/templates/person-detail", function(exports, require, module) {
 var __templateData = function template(locals) {
 var buf = [];
@@ -1740,11 +2186,12 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var locals_ = (locals || {}),id = locals_.id;
-buf.push("<input name=\"first_name\" placeholder=\"First Name\"/><input name=\"last_name\" placeholder=\"Last Name\"/><button class=\"save\">Save</button><br/><br/>");
+buf.push("<form><div class=\"errors\"></div><input name=\"first_name\" placeholder=\"First Name\"/><input name=\"last_name\" placeholder=\"Last Name\"/><button class=\"save\">Save</button><br/><br/>");
 if ( id)
 {
 buf.push("<button class=\"destroy\">Delete</button>");
-};return buf.join("");
+}
+buf.push("</form>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
