@@ -39,7 +39,7 @@ module.exports = class LoanEditView extends View
     unless @model
       @model = new Loan()
     super
-    if old_lendee and new_lendee != old_lendee
+    if old_lendee and new_lendee != old_lendee and @model.isValid()
       @publishEvent 'lendee_change', old_lendee
 
   checkOption: (e) ->
