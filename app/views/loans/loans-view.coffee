@@ -19,6 +19,6 @@ module.exports = class LoansView extends CollectionView
       loan_link.parentNode.removeChild(loan_link)
   initItemView: (model) ->
     if @detailed
-      new LoanDetailView model: model
+      new LoanDetailView model: model, details: true
     else
       new LoanView model: model

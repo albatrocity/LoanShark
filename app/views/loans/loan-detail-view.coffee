@@ -7,6 +7,9 @@ module.exports = class LoanDetailView extends LoanView
   render: ->
     super
     @renderUserView()
+    @el.querySelector('.daysPastDue').innerHTML = @model.getDaysPastDue()
+    @el.querySelector('.compoundInterest').innerHTML = @model.calculateInterest()
+    @el.querySelector('.compoundValue').innerHTML = @model.getTotalValue()
 
   renderUserView: ->
     person = Chaplin.mediator.people.get @model.get('lendee_id')
