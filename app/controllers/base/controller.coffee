@@ -28,7 +28,7 @@ module.exports = class Controller extends Chaplin.Controller
       cb(model)
 
   udpateModel: (model, collection, options) ->
-    if model.isNew()
+    if model.isNew() and model.isValid()
       model.set('created_at', new Date)
       collection.add model
     model.set('updated_at', new Date)
@@ -36,4 +36,5 @@ module.exports = class Controller extends Chaplin.Controller
       success: (model, attrs) =>
         options.success(model) if options.success
       error: (model, err) ->
+        @publishEvent 'render_error', err
         options.error(model, err) if options.error

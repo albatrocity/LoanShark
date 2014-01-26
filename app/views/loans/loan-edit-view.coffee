@@ -1,4 +1,4 @@
-View            = require 'views/base/view'
+View            = require 'views/base/form-view'
 PeopleView      = require 'views/people/people-view'
 PersonEditView  = require 'views/people/person-edit-view'
 SelectInputView = require 'views/form_elements/select-input-view'
@@ -39,7 +39,7 @@ module.exports = class LoanEditView extends View
     unless @model
       @model = new Loan()
     super
-    if old_lendee and new_lendee != old_lendee
+    if old_lendee and new_lendee != old_lendee and @model.isValid()
       @publishEvent 'lendee_change', old_lendee
 
   checkOption: (e) ->

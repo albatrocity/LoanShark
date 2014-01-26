@@ -1,4 +1,4 @@
-View       = require 'views/base/view'
+View       = require 'views/base/form-view'
 Person     = require 'models/person'
 PeopleView = require 'views/people/people-view'
 

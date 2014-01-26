@@ -16,15 +16,15 @@ module.exports = class Loan extends Model
     @save()
 
   save: ->
-    @updateBounties()
+    @updateBounties() if @isValid()
     super
   destroy: ->
     super
     @updateBounties()
   updateBounties: ->
     people = Chaplin.mediator.people
-    lendee     = people.get(@get('lendee_id'))
-    lendee.calculateBounty()
+    lendee = people.get(@get('lendee_id'))
+    lendee.calculateBounty() if lendee
 
   getDaysPastDue: ->
     if @get 'created_at'
@@ -48,3 +48,10 @@ module.exports = class Loan extends Model
   getTotalValue: ->
     parseInt(@get 'value') + @calculateInterest()
 
+  validate: (attrs) ->
+    errors = []
+    if attrs.item_name is ''
+      errors.push "Make a note of what the loan is for. That description field is required."
+    if attrs.value is ''
+      errors.push "Add a value so we can calculate a bounty on this person's head."
+    return errors if errors.length

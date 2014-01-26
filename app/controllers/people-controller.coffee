@@ -36,14 +36,12 @@ module.exports = class LoansController extends Controller
       message = "Successfully added #{name}"
     else
       message = "Successfully edited #{name}"
-
     @udpateModel model, people,
       success: (model) =>
         @redirectTo 'person', id: model.get('id')
         @publishEvent 'flash_message', message
       error: (model, err) =>
-        console.log err
-        @publishEvent 'error', err
+        @publishEvent 'render_error', err
 
 
   show: (params) ->

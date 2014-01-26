@@ -49,7 +49,7 @@ module.exports = class LoansController extends Controller
         cb person, model
       error: (model, err) =>
         console.log err
-        @publishEvent 'error', err
+        @publishEvent 'render_error', err
 
   persist: (model) ->
     item_name = model.get('item_name')
@@ -64,4 +64,4 @@ module.exports = class LoansController extends Controller
         @publishEvent 'flash_message', message
       error: (model, err) =>
         console.log err
-        @publishEvent 'error', err
+        @publishEvent 'render_error', err
